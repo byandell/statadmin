@@ -1,0 +1,72 @@
+Statistics Summaries from UW Data Warehouse Query
+========================================================
+
+First we do some data setup.
+```{r}
+source("query.R")
+```
+Summary by course group.
+```{r}
+table(course.group)
+tapply(query$enroll[query$SECTION < 300],course.group[query$SECTION < 300], sum)
+## Want summary table by year.
+```
+All courses.
+```{r fig.width=7, fig.height=6}
+lecplots(query,, course.group, title = "All Courses")
+```
+Instructor type for all classes.
+```{r}
+lecplots(query, query$year != "2014-2015", query$instructor, smooth=FALSE,
+         title = "Instructor Type for All Classes")
+```
+Undergrad courses.
+```{r}
+lecplots(query, (query$CATALOG < 500), course.group, title = "Undergrad Courses")
+```
+Instructor type for Undergrad Courses.
+```{r}
+lecplots(query, query$year != "2014-2015" & query$CATALOG < 600, query$instructor, smooth=FALSE,
+         title = "Instructor for Undergrad Classes")
+```
+Instructor type for Introductory (gateway) Courses.
+```{r}
+lecplots(query, query$year != "2014-2015" & query$CATALOG %in% gateways, query$instructor, smooth=FALSE,
+         title = "Instructor for Gateway Classes")
+```
+Introductory (gateway) courses.
+```{r}
+lecplots(query, (query$CATALOG %in% gateways), query$CATALOG, smooth = FALSE,
+         title = "Gateway Courses")
+tmp <- query[query$CAT %in% gateways & query$SEC < 300 &
+               !(query$CAT %in% c(201,302)) & !(query$term == "Summer") &
+               !(query$year == "2014-2015"), ]
+tmp$course <- ordered(tmp$CATALOG.NUMBER)
+xyplot(enroll ~ TERM | course, tmp, type = c("p","smooth"),
+       main = "Gateway Enrollments per Lecture")
+```
+Math stat courses (including Math 431).
+```{r}
+tmp <- rbind(query, math431)
+lecplots(tmp, (tmp$CATALOG %in% mathstats), tmp$CATALOG, smooth = FALSE,
+         title = "Math-Stat Courses")
+tmp <- tmp[tmp$CAT %in% mathstats & tmp$SEC < 300, ]
+tmp$course <- ordered(tmp$CATALOG.NUMBER, c(309,310,431,311,312))
+xyplot(enroll ~ TERM | course, tmp, type = c("p","smooth"),
+       main = "Math Stat Enrollments per Lecture")
+```
+Grad gateway courses.
+```{r}
+lecplots(query, (query$CATALOG %in% gategrads), query$CATALOG, smooth = FALSE,
+         title = "Grad Non-Major Gateway Courses")
+```
+Grad only courses.
+```{r}
+lecplots(query, (query$CATALOG > 600), course.group,
+         title = "Grad Major Courses")
+```
+Grad core courses.
+```{r}
+lecplots(query, (query$CATALOG %in% gradcore), query$CATALOG, smooth = FALSE,
+         title = "Grad Major Core Courses")
+```

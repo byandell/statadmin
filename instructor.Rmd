@@ -1,0 +1,101 @@
+---
+title: "Stat Dept Instruction History"
+author: "Brian S Yandell"
+date: "June 26, 2014"
+output: beamer_presentation
+---
+
+## First we do some data setup.
+
+- Read in CSV file.
+- Find enrollment per lecture/discussion.
+- Remove non-Stat courses.
+- Keep Math 431 handy.
+- Pull out lectures only.
+- Fix recording problems.
+- Organize course by groups.
+
+```{r}
+source("query.R")
+```
+
+## Then make plots.
+
+- Plot Enrollment per Year by Course Group.
+
+```{}
+library(lattice)
+lecploty(query, group = course.group)
+```
+
+- Plot Enrollment per lecture over years by course.
+
+```{}
+lec <- query[query$SECTION.NUMBER < 300 & 
+               query$term != "Summer", ]
+xyplot(enroll ~ TERM | CATALOG.NUMBER, lec)
+```
+
+## Enrollment for Undergrad Courses
+
+```{r, echo=FALSE}
+library(lattice)
+lecploty(query, (query$CATALOG.NUMBER < 500), course.group, title = "Undergrad Courses")
+```
+
+## Instructor for UG Classes
+
+```{r, echo=FALSE}
+lecploty(query, query$year != "2014-2015" & query$CATALOG.NUMBER < 600, query$instructor, smooth=FALSE,
+         title = "Instructor for Undergrad Classes")
+```
+
+## Instructor for Gateway Classes
+
+```{r, echo=FALSE}
+lecploty(query, query$year != "2014-2015" & query$CATALOG.NUMBER %in% gateways, query$instructor, smooth=FALSE,
+         title = "Instructor for Gateway Classes")
+```
+
+## Enrollment for Gateway Classes
+
+```{r, echo=FALSE}
+lecploty(query, (query$CATALOG.NUMBER %in% gateways), query$CATALOG.NUMBER, smooth = FALSE,
+         title = "Gateway Courses")
+```
+
+## Gateway Enrollment per Lecture
+
+```{r, echo=FALSE}
+tmp <- query[query$CATALOG.NUMBER %in% gateways & query$SECTION.NUMBER < 300 &
+               !(query$CATALOG.NUMBER %in% c(201,302)) & !(query$term == "Summer") &
+               !(query$year == "2014-2015"), ]
+tmp$course <- ordered(tmp$CATALOG.NUMBER)
+xyplot(enroll ~ TERM | course, tmp, type = c("p","smooth"),
+       main = "Gateway Enrollments per Lecture")
+```
+
+## Math Stat Courses by Year.
+
+```{r, echo=FALSE}
+tmp <- rbind(query, math431)
+lecploty(tmp, (tmp$CATALOG.NUMBER %in% mathstats), tmp$CATALOG.NUMBER, smooth = FALSE,
+         title = "Math-Stat Courses")
+```
+
+## Math Stat Courses by Term.
+
+```{r, echo=FALSE}
+lecplott(tmp, (tmp$CATALOG.NUMBER %in% mathstats), tmp$CATALOG.NUMBER, smooth = FALSE,
+         title = "Math-Stat Courses")
+```
+
+## Math-Stat Enrollment per Lecture
+
+```{r, echo=FALSE}
+tmp <- tmp[tmp$CATALOG.NUMBER %in% mathstats & tmp$SECTION.NUMBER < 300 & !(tmp$term == "Summer") &
+               !(tmp$year == "2014-1015"), ]
+tmp$course <- ordered(tmp$CATALOG.NUMBER, c(309,310,431,311,312))
+xyplot(enroll ~ TERM | course, tmp, type = c("p","smooth"),
+       main = "Math Stat Enrollments per Lecture")
+```
