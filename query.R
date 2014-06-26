@@ -2,7 +2,7 @@
 source("routines.R")
 
 ## First we do some data setup.
-query <- read.csv("932 query.csv", header=TRUE)
+query <- read.csv("../932 query.csv", header=TRUE)
 query$enroll <- apply(query[,8:9], 1, max)
 query <- query[,-c(3,8:10)]
 query <- query[query$SECTION.NUMBER > 0,]
