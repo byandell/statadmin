@@ -1,3 +1,11 @@
 .Rproj.user
 .Rhistory
 .RData
+*.png
+figure
+*~
+cache
+*.html
+*.md
+*.png
+*.pdf
