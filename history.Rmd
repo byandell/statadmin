@@ -1,0 +1,37 @@
+---
+title: "Instructor History"
+author: "Brian S Yandell"
+date: "November 29, 2014"
+output: beamer_presentation
+---
+
+## R Markdown
+
+- Goal here is to look at instructor history. 
+- What is in place is data setup.
+- See pull.instructor(faculty, "Ward")
+
+## Slide with R Code and Output
+
+```{r}
+faclec <- lec[lec$INSTRUCTOR.ROLE.DESCR == "Faculty",]
+faclec$INSTRUCTOR.NAME <- factor(faclec$INSTRUCTOR.NAME)
+xtabs(~CATALOG.NUMBER, faclec)
+tapply(faclec$enroll, faclec$year, sum)
+```
+
+## Table of course groups by year
+
+```{r}
+faclec$groups <- group.courses(faclec)
+xtabs(~year + groups, faclec)
+```
+
+## Pull out faculty records
+
+```{r}
+faculty <- faclec[,c("INSTRUCTOR.NAME", "year", "CATALOG.NUMBER", "groups", "enroll")]
+names(faculty)[c(1,3)] <- c("instructor", "course")
+faculty.bw <- pull.instructor(faculty, "Ward")
+head(faculty.bw)
+```

@@ -1,3 +1,29 @@
+group.courses <- function(query) {
+  ## Set up courses into groups of interest.
+  gateways <- c(201,224,301,302,324,371)
+  gategrads <- c(541,542,543,571,572)
+  mathstats <- c(309,310,311,312,431)
+  gradcore <- c(609,610,709,710,849,850,998)
+  directed <- c(681,682,698,699,990)
+  
+  ## Organize courses by group.
+  course.group <- 3 - 2 * (query$CATALOG.NUMBER %in% gateways) -
+    (query$CATALOG.NUMBER %in% mathstats) +
+    (query$CATALOG.NUMBER %in% gategrads) +
+    2 * (query$CATALOG.NUMBER > 600) +
+    (query$CATALOG.NUMBER %in% gradcore) +
+    2 * (query$CATALOG.NUMBER %in% directed)
+  tmp <- c("intro","mathstat","major","gategrads","grad","gradcore","directed")
+  ordered(tmp[course.group], tmp)
+}
+pull.instructor <- function(faculty, instructor, drop.directed = TRUE) {
+  ## Pull instructor records for partial match to instructor name.
+  if(drop.directed)
+    faculty <- faculty[faculty$groups != "directed",]
+  faculty[grep(instructor, faculty$instructor), -1]
+}
+
+
 lecsum <- function(query, subset = NULL, group = NULL,
                    by.term = TRUE, year1 = 1999, summer = FALSE, ...) {
   ## Get subset of data to work with.

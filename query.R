@@ -34,19 +34,5 @@ math431$instructor <- math431$INSTRUCTOR.ROLE.DESCR
 tmp <- query$INSTRUCTOR.NAME %in% c("Gillett,John Robert","Vieira Nunes Ludwig,Guilherme") & query$CATALOG.NUMBER == 692
 query$CATALOG.NUMBER[tmp] <- 327
 
-## Set up courses into groups of interest.
-gateways <- c(201,224,301,302,324,371)
-gategrads <- c(541,542,543,571,572)
-mathstats <- c(309,310,311,312,431)
-gradcore <- c(609,610,709,710,849,850,998)
-directed <- c(681,682,698,699,990)
-
 ## Organize courses by group using course.group.
-course.group <- 3 - 2 * (query$CATALOG.NUMBER %in% gateways) -
-  (query$CATALOG.NUMBER %in% mathstats) +
-  (query$CATALOG.NUMBER %in% gategrads) +
-  2 * (query$CATALOG.NUMBER > 600) +
-  (query$CATALOG.NUMBER %in% gradcore) +
-  2 * (query$CATALOG.NUMBER %in% directed)
-tmp <- c("intro","mathstat","major","gategrads","grad","gradcore","directed")
-course.group <- ordered(tmp[course.group], tmp)
+course.group <- group.courses(query)
